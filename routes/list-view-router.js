@@ -1,9 +1,17 @@
 const express = require("express");
 const listViewRouter = express.Router();
 const taskList = require("../utils/taskList.json");
+const connectDB = require("../db");
 
-listViewRouter.route("/list_view").get((req, res) => {
-  res.status(200).send({ taskList: taskList });
+listViewRouter.route("/list_view").get(async (req, res) => {
+  try {
+    const database = await connectDB();
+    const collection = database.collection("todo_list");
+    const toDoListDB = await collection.find({}).toArray();
+    return res.status(200).send({ toDoList: toDoListDB });
+  } catch (e) {
+    return res.status(400).send({ error: e });
+  }
 });
 
 listViewRouter.route("/list_view/:id").get((req, res) => {
@@ -29,12 +37,12 @@ listViewRouter.route("/list_view/:type").get((req, res) => {
 
 listViewRouter.route("/list_view_completed").get((req, res) => {
   let newTaskList = taskList.filter(task => task.status !== "Not completed");
-  res.status(200).send({ taskListCompleted: newTaskList });
+  res.status(200).send({ toDoListCompleted: newTaskList });
 });
 
 listViewRouter.route("/list_view_not_completed").get((req, res) => {
   let newTaskList = taskList.filter(task => task.status === "Not completed");
-  res.status(200).send({ taskListNotCompleted: newTaskList });
+  res.status(200).send({ toDoListNotCompleted: newTaskList });
 });
 
 module.exports = listViewRouter;
