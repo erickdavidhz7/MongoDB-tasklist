@@ -1,6 +1,5 @@
 const express = require("express");
 const listEditRouter = express.Router();
-const taskList = require("../utils/taskList.json");
 const validListEditRouter = require("../middlewares/validListEditRouter");
 const connectDB = require("../db");
 const { ObjectId } = require("mongodb");
@@ -48,9 +47,6 @@ listEditRouter
     } catch (e) {
       return res.status(400).send({ error: e });
     }
-/*     const id = req.params.id;
-    const newTaskList = taskList.filter(task => task.id != id);
-    res.send({ taskList_edited: newTaskList }); */
   });
 
 module.exports = listEditRouter;

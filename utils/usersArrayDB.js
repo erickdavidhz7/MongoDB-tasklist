@@ -14,11 +14,6 @@ const usersArrayDB = [
     password: "password_example",
     role: "User",
   },
-  {
-    email: "erickdavid7@hotmail.com",
-    password: "password_example",
-    role: "User",
-  },
 ];
 
 module.exports = usersArrayDB;
