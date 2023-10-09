@@ -1,6 +1,5 @@
 const express = require("express");
 const listViewRouter = express.Router();
-const taskList = require("../utils/taskList.json");
 const connectDB = require("../db");
 const { ObjectId } = require("mongodb");
 

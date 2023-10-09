@@ -2,38 +2,55 @@ const express = require("express");
 const listEditRouter = express.Router();
 const taskList = require("../utils/taskList.json");
 const validListEditRouter = require("../middlewares/validListEditRouter");
-const { v4: uuidv4 } = require('uuid');
+const connectDB = require("../db");
+const { ObjectId } = require("mongodb");
 
-
-listEditRouter.route("/list_create").post(validListEditRouter, (req, res) => {
-  const newTask = {id: uuidv4(), ...req.body};
-  taskList.push(newTask);
-  res.send({ taskList_edited: taskList });
-});
+listEditRouter
+  .route("/list_create")
+  .post(validListEditRouter, async (req, res) => {
+    try {
+      const data = req.body;
+      const database = await connectDB();
+      const collection = database.collection("todo_list");
+      await collection.insertOne(data);
+      const toDoListDB = await collection.find({}).toArray();
+      return res.status(200).send({ toDoListUpdated: toDoListDB });
+    } catch (e) {
+      return res.status(400).send({ error: e });
+    }
+  });
 
 listEditRouter
   .route("/list_edit/:id")
-  .put(validListEditRouter, (req, res) => {
-    const id = req.params.id;
-    const taskUpdate = req.body;
-    console.log(taskUpdate);
-    const newTaskList = taskList.map(task => {
-      if (task.id == id)
-        return {
-          ...task,
-          name: taskUpdate.name,
-          description: taskUpdate.description,
-          status: taskUpdate.status,
-        };
-      else return task;
-    });
-    res.send({ taskList_edited: newTaskList });
+  .put(validListEditRouter, async (req, res) => {
+    try {
+      const id = new ObjectId(req.params.id);
+      const data = req.body;
+      const database = await connectDB();
+      const collection = database.collection("todo_list");
+      const filter = { _id: id };
+      const updateDoc = { $set: data };
+      await collection.updateOne(filter, updateDoc);
+      const toDoListDB = await collection.find({}).toArray();
+      return res.status(200).send({ toDoListUpdated: toDoListDB });
+    } catch (e) {
+      return res.status(400).send({ error: e });
+    }
   })
-
-  .delete(validListEditRouter, (req, res) => {
-    const id = req.params.id;
+  .delete(validListEditRouter, async (req, res) => {
+    try {
+      const id = new ObjectId(req.params.id);
+      const database = await connectDB();
+      const collection = database.collection("todo_list");
+      await collection.deleteOne({_id : {$eq : id}});
+      const toDoListDB = await collection.find({}).toArray();
+      return res.status(200).send({ toDoListUpdated: toDoListDB });
+    } catch (e) {
+      return res.status(400).send({ error: e });
+    }
+/*     const id = req.params.id;
     const newTaskList = taskList.filter(task => task.id != id);
-    res.send({ taskList_edited: newTaskList });
+    res.send({ taskList_edited: newTaskList }); */
   });
 
 module.exports = listEditRouter;
