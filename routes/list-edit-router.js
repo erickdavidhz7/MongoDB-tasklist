@@ -10,7 +10,7 @@ listEditRouter
     try {
       const data = req.body;
       const database = await connectDB();
-      const collection = database.collection("todo_list");
+      const collection = database.collection("tasks");
       await collection.insertOne(data);
       const toDoListDB = await collection.find({}).toArray();
       return res.status(200).send({ toDoListUpdated: toDoListDB });
@@ -26,7 +26,7 @@ listEditRouter
       const id = new ObjectId(req.params.id);
       const data = req.body;
       const database = await connectDB();
-      const collection = database.collection("todo_list");
+      const collection = database.collection("tasks");
       const filter = { _id: id };
       const updateDoc = { $set: data };
       await collection.updateOne(filter, updateDoc);
@@ -40,7 +40,7 @@ listEditRouter
     try {
       const id = new ObjectId(req.params.id);
       const database = await connectDB();
-      const collection = database.collection("todo_list");
+      const collection = database.collection("tasks");
       await collection.deleteOne({_id : {$eq : id}});
       const toDoListDB = await collection.find({}).toArray();
       return res.status(200).send({ toDoListUpdated: toDoListDB });
