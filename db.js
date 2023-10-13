@@ -1,13 +1,14 @@
-const { MongoClient} = require("mongodb");
+const mongoose = require("mongoose");
 require("dotenv").config();
-const url = process.env.MONGO_URI;
-const client = new MongoClient(url);
 
-const dbName = "todo_list_database";
 const connectDB = async function(){
-  await client.connect();
-  const db = client.db(dbName);
-  return db;
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connected Db");
+    return mongoose.connection;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 module.exports = connectDB;
