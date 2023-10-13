@@ -5,9 +5,10 @@ const listViewRouter = require("./routes/list-view-router");
 const listEditRouter = require("./routes/list-edit-router");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const usersArrayDB = require("./utils/usersArrayDB");
 const validateJWT = require("./middlewares/validateJWT");
 const validRole = require("./middlewares/validRole");
+const connectDB = require("./db");
+const UserModel = require("./schemas/userModel");
 require("dotenv").config();
 
 app.use(express.json());
@@ -29,10 +30,36 @@ app.get("/this-should-exists", (req, res) => {
   res.status(404).send({ error: "Not found" });
 });
 
-app.post("/login", (req, res) => {
-  const dataUser = req.body;
+app.post("/register", async (req, res) => {
+  try {
+    const dataUser = req.body;
+    dataUser.role = dataUser.role ?? "User";
+    await connectDB();
+    const usersArrayDB = await UserModel.find({});
+    const validateUniqueEmail = usersArrayDB.some(
+      userDB => userDB.email === dataUser.email
+    );
 
-  const validateUser = usersArrayDB.some(
+    if (validateUniqueEmail) {
+      return res.status(400).send({
+        error: "This email has been used already.",
+      });
+    }
+
+    const newUser = new UserModel(dataUser);
+    newUser.save();
+
+    return res.status(200).send({ newUser: newUser });
+  } catch (e) {
+    return res.status(400).send({ error: e });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const dataUser = req.body;
+  await connectDB();
+  const usersArrayDB = await UserModel.find({});
+  const validateUser = usersArrayDB.find(
     userDB =>
       userDB.email === dataUser.email && userDB.password === dataUser.password
   );
@@ -40,10 +67,12 @@ app.post("/login", (req, res) => {
   if (!validateUser) {
     return res.status(400).send({ error: "User invalid" });
   }
+
   const payLoad = {
-    email: dataUser.email,
-    role: dataUser.role,
+    email: validateUser.email,
+    role: validateUser.role,
   };
+  req.role = validateUser.role;
   const token = jwt.sign(payLoad, process.env.SECRET);
   return res
     .status(200)
