@@ -30,6 +30,7 @@ app.get("/this-should-exists", (req, res) => {
   res.status(404).send({ error: "Not found" });
 });
 
+// Ruta para registrar un nuevo usuario
 app.post("/register", async (req, res) => {
   try {
     const dataUser = req.body;
@@ -55,6 +56,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
+// Ruta para que un usuario pueda hacer login
 app.post("/login", async (req, res) => {
   const dataUser = req.body;
   await connectDB();
@@ -72,13 +74,16 @@ app.post("/login", async (req, res) => {
     email: validateUser.email,
     role: validateUser.role,
   };
+
   req.role = validateUser.role;
+
   const token = jwt.sign(payLoad, process.env.SECRET);
   return res
     .status(200)
     .send({ message: `Welcome ${dataUser.email}`, token: token });
 });
 
+// Ruta para autenticar el usuario que ha echo login
 app.get("/auth", validateJWT, validRole, (req, res) => {
   res.send({ authentication: "The authentication has been succesful" });
 });
