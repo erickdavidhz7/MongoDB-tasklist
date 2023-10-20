@@ -10,7 +10,8 @@ listViewRouter.route("/list_view").get(async (req, res) => {
     const toDoListDB = await TaskModel.find({});
     return res.status(200).send({ toDoList: toDoListDB });
   } catch (e) {
-    return res.status(400).send({ error: e });
+    console.error(e);
+    return res.status(500).send({ error: e });
   }
 });
 
@@ -22,7 +23,8 @@ listViewRouter.route("/list_view/:id").get(async (req, res) => {
     if (taskDB) return res.status(200).send({ Task: taskDB });
     else return res.status(400).send({ error: `ID not found` });
   } catch (e) {
-    return res.status(400).send({ error: `ID not found` });
+    console.error(e);
+    return res.status(500).send({ error: `ID not found` });
   }
 });
 
@@ -44,7 +46,8 @@ listViewRouter.route("/list_view_completed").get(async (req, res) => {
     const toDoListDB = await TaskModel.find({ status: { $eq: type } });
     return res.status(200).send({ toDoListCompleted: toDoListDB });
   } catch (e) {
-    return res.status(400).send({ error: e });
+    console.error(e);
+    return res.status(500).send({ error: e });
   }
 });
 
@@ -55,7 +58,8 @@ listViewRouter.route("/list_view_not_completed").get(async (req, res) => {
     const toDoListDB = await TaskModel.find({ status: { $eq: type } });
     return res.status(200).send({ toDoListCompleted: toDoListDB });
   } catch (e) {
-    return res.status(400).send({ error: e });
+    console.error(e);
+    return res.status(500).send({ error: e });
   }
 });
 

@@ -16,7 +16,8 @@ listEditRouter
       const toDoListDB = await TaskModel.find({});
       return res.status(200).send({ toDoListUpdated: toDoListDB });
     } catch (e) {
-      return res.status(400).send({ error: e });
+      console.error(e);
+      return res.status(500).send({ error: e });
     }
   });
 
@@ -34,18 +35,19 @@ listEditRouter
       return res.status(200).send({ toDoListUpdated: toDoListDB });
     } catch (e) {
       console.log(e);
-      return res.status(400).send({ error: e });
+      return res.status(500).send({ error: e });
     }
   })
   .delete(validListEditRouter, async (req, res) => {
     try {
       const id = new mongoose.Types.ObjectId(req.params.id);
       await connectDB();
-      await TaskModel.deleteOne({_id : {$eq : id}});
+      await TaskModel.deleteOne({ _id: { $eq: id } });
       const toDoListDB = await TaskModel.find({});
       return res.status(200).send({ toDoListUpdated: toDoListDB });
     } catch (e) {
-      return res.status(400).send({ error: e });
+      console.error(e);
+      return res.status(500).send({ error: e });
     }
   });
 
