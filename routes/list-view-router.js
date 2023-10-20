@@ -56,7 +56,7 @@ listViewRouter.route("/list_view_not_completed").get(async (req, res) => {
     const type = "Not completed";
     await connectDB();
     const toDoListDB = await TaskModel.find({ status: { $eq: type } });
-    return res.status(200).send({ toDoListCompleted: toDoListDB });
+    return res.status(200).send({ toDoListNotCompleted: toDoListDB });
   } catch (e) {
     console.error(e);
     return res.status(500).send({ error: e });
