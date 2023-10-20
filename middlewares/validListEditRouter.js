@@ -26,14 +26,14 @@ module.exports = function validListEditRouter(req, res, next) {
       return res
         .status(400)
         .send({ error: "Object must have all the required properties" });
-    } else if (!parseInt(id)) {
+    } else if (!id) {
       return res.status(400).send({ error: "Invalid ID" });
     } else {
       return next();
     }
   } else if (req.method === "DELETE") {
     const id = req.params.id;
-    if (!parseInt(id)) {
+    if (!id) {
       return res.status(400).send({ error: "Invalid ID" });
     } else {
       next();

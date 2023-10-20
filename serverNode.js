@@ -52,35 +52,41 @@ app.post("/register", async (req, res) => {
 
     return res.status(200).send({ newUser: newUser });
   } catch (e) {
-    return res.status(400).send({ error: e });
+    console.log(e);
+    return res.status(400).send({ error: e.message });
   }
 });
 
 // Ruta para que un usuario pueda hacer login
 app.post("/login", async (req, res) => {
-  const dataUser = req.body;
-  await connectDB();
-  const usersArrayDB = await UserModel.find({});
-  const validateUser = usersArrayDB.find(
-    userDB =>
-      userDB.email === dataUser.email && userDB.password === dataUser.password
-  );
+  try{
+    const dataUser = req.body;
+    await connectDB();
+    const usersArrayDB = await UserModel.find({});
+    const validateUser = usersArrayDB.find(
+      userDB =>
+        userDB.email === dataUser.email && userDB.password === dataUser.password
+    );
+  
+    if (!validateUser) {
+      return res.status(400).send({ error: "User invalid" });
+    }
+  
+    const payLoad = {
+      id: validateUser._id,
+      email: validateUser.email,
+      role: validateUser.role,
+    };
+  
+    const token = jwt.sign(payLoad, process.env.SECRET);
+    return res
+      .status(200)
+      .send({ message: `Welcome ${dataUser.email}`, token: token });
 
-  if (!validateUser) {
-    return res.status(400).send({ error: "User invalid" });
+  } catch(e){
+    console.log(e);
+    res.status(400).send({message: "Something went wrong!", error: e.message});
   }
-
-  const payLoad = {
-    email: validateUser.email,
-    role: validateUser.role,
-  };
-
-  req.role = validateUser.role;
-
-  const token = jwt.sign(payLoad, process.env.SECRET);
-  return res
-    .status(200)
-    .send({ message: `Welcome ${dataUser.email}`, token: token });
 });
 
 // Ruta para autenticar el usuario que ha echo login
